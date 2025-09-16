@@ -31,9 +31,9 @@ func monitorCPUTemperature() {
 			fmt.Println("Error reading CPU temperature:", err)
 			continue
 		}
-		fmt.Println("CPU Temperature:", fmt.Sprintf("%.2f", temp), "°C")
+		sendViaMQTT(cpuTemperatureConfig.Topic, fmt.Sprintf("%.2f", temp))
 
 		// wait for the configured interval before reading again
-		time.Sleep(time.Duration(env.GetEnvAsInt("CPU_TEMPERATURE_INTERVAL", 1000)) * time.Millisecond)
+		time.Sleep(time.Duration(cpuTemperatureConfig.Interval) * time.Millisecond)
 	}
 }

@@ -20,6 +20,11 @@ func main() {
 		go monitorCPUTemperature()
 	}
 
+	// Power Supply Voltage
+	if env.GetEnvAsBool("POWER_SUPPLY_ENABLED", false) {
+		go monitorPowerSupply()
+	}
+
 	// Prevent the main function from exiting
 	select {}
 }
@@ -35,5 +40,21 @@ func monitorCPUTemperature() {
 
 		// wait for the configured interval before reading again
 		time.Sleep(time.Duration(cpuTemperatureConfig.Interval) * time.Millisecond)
+	}
+}
+
+func monitorPowerSupply() {
+	for {
+		power, err := readPowerSupply()
+		if err != nil {
+			fmt.Println("Error reading Power Supply:", err)
+			continue
+		}
+		power *= 1.1451
+		power += 0.5879
+		sendViaMQTT(powerSupplyConfig.Topic, fmt.Sprintf("%.2f", power))
+
+		// wait for the configured interval before reading again
+		time.Sleep(time.Duration(powerSupplyConfig.Interval) * time.Millisecond)
 	}
 }

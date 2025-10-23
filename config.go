@@ -32,6 +32,7 @@ func parseInterval(intervalStr string) int {
 
 var mqttCredentials MqttConfig
 var cpuTemperatureConfig MetricsConfig
+var powerSupplyConfig MetricsConfig
 
 func initConfig() {
 	mqttCredentials = MqttConfig{
@@ -46,5 +47,11 @@ func initConfig() {
 		Enabled:  env.GetEnvAsBool("CPU_TEMPERATURE_ENABLED", false),
 		Interval: parseInterval(env.GetEnv("CPU_TEMPERATURE_INTERVAL", "10000ms")),
 		Topic:    mqttCredentials.Prefix + "temperature/" + env.GetEnv("CPU_ENTITY_NAME", "cpu") + "/state",
+	}
+
+	powerSupplyConfig = MetricsConfig{
+		Enabled:  env.GetEnvAsBool("POWER_SUPPLY_ENABLED", false),
+		Interval: parseInterval(env.GetEnv("POWER_SUPPLY_INTERVAL", "10000ms")),
+		Topic:    mqttCredentials.Prefix + "voltage/" + env.GetEnv("POWER_SUPPLY_ENTITY_NAME", "power_supply") + "/state",
 	}
 }

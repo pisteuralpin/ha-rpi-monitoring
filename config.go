@@ -19,6 +19,17 @@ type MetricsConfig struct {
 	Topic    string // MQTT topic to publish the metric
 }
 
+func parseInterval(intervalStr string) int {
+	cpuInterval := 0
+	if intervalStr[len(intervalStr)-1] == 's' {
+		cpuInterval, _ = strconv.Atoi(intervalStr[:len(intervalStr)-1])
+		cpuInterval *= 1000
+	} else if intervalStr[len(intervalStr)-2:] == "ms" {
+		cpuInterval, _ = strconv.Atoi(intervalStr[:len(intervalStr)-2])
+	}
+	return cpuInterval
+}
+
 var mqttCredentials MqttConfig
 var cpuTemperatureConfig MetricsConfig
 
@@ -31,18 +42,9 @@ func initConfig() {
 		Prefix:   env.GetEnv("MQTT_PREFIX", "homeassistant/"),
 	}
 
-	var cpuInterval int
-
-	if env.GetEnv("CPU_TEMPERATURE_INTERVAL", "5s")[len(env.GetEnv("CPU_TEMPERATURE_INTERVAL", "5s"))-1] == 's' {
-		cpuInterval, _ = strconv.Atoi(env.GetEnv("CPU_TEMPERATURE_INTERVAL", "5s")[:len(env.GetEnv("CPU_TEMPERATURE_INTERVAL", "5s"))-1])
-		cpuInterval *= 1000
-	} else if env.GetEnv("CPU_TEMPERATURE_INTERVAL", "5000ms")[len(env.GetEnv("CPU_TEMPERATURE_INTERVAL", "5000ms"))-2:] == "ms" {
-		cpuInterval, _ = strconv.Atoi(env.GetEnv("CPU_TEMPERATURE_INTERVAL", "5000ms")[:len(env.GetEnv("CPU_TEMPERATURE_INTERVAL", "5000ms"))-2])
-	}
-
 	cpuTemperatureConfig = MetricsConfig{
 		Enabled:  env.GetEnvAsBool("CPU_TEMPERATURE_ENABLED", false),
-		Interval: cpuInterval,
+		Interval: parseInterval(env.GetEnv("CPU_TEMPERATURE_INTERVAL", "10000ms")),
 		Topic:    mqttCredentials.Prefix + "temperature/" + env.GetEnv("CPU_ENTITY_NAME", "cpu") + "/state",
 	}
 }

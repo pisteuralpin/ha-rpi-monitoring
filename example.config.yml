@@ -1,0 +1,19 @@
+homeassistant:
+  discovery: true
+  prefix: homeassistant
+
+device:
+  id: home_server
+  unique_id: 01K868V35X675BJPK4C9DGG2ZH
+  name: Home Server
+  model: Raspberry Pi 5 16GB
+
+cpu_temperature:
+  enabled: true
+  entity_name: cpu
+  interval: 10s
+
+power_supply:
+  enabled: true
+  entity_name: power_supply
+  interval: 10s

@@ -3,25 +3,33 @@ package main
 import (
 	"fmt"
 	"ha-rpi-monitoring/v0.1/lib/env"
+	"log/slog"
 	"time"
 )
 
 func main() {
-	fmt.Println("Starting Raspberry Pi Monitoring...")
-
 	env.LoadEnv()
+
+	initLogger()
+
+	slog.Info("Starting Raspberry Pi Monitoring...")
 
 	initConfig()
 
 	fmt.Println("✅ Raspberry Pi Monitoring started.")
 
+	if config.HomeAssistant.Discovery {
+		initDiscovering()
+		slog.Info("Home Assistant discovery messages sent.")
+	}
+
 	// CPU Temperature
-	if env.GetEnvAsBool("CPU_TEMPERATURE_ENABLED", false) {
+	if config.CpuTemperature.Enabled {
 		go monitorCPUTemperature()
 	}
 
 	// Power Supply Voltage
-	if env.GetEnvAsBool("POWER_SUPPLY_ENABLED", false) {
+	if config.PowerSupply.Enabled {
 		go monitorPowerSupply()
 	}
 
@@ -33,13 +41,13 @@ func monitorCPUTemperature() {
 	for {
 		temp, err := readCPUTemperature()
 		if err != nil {
-			fmt.Println("Error reading CPU temperature:", err)
+			slog.Warn("Error reading CPU Temperature:", "error", err)
 			continue
 		}
-		sendViaMQTT(cpuTemperatureConfig.Topic, fmt.Sprintf("%.2f", temp))
+		sendViaMQTT(config.CpuTemperature.Topic, fmt.Sprintf("%.2f", temp))
 
 		// wait for the configured interval before reading again
-		time.Sleep(time.Duration(cpuTemperatureConfig.Interval) * time.Millisecond)
+		time.Sleep(time.Duration(config.CpuTemperature.Interval) * time.Millisecond)
 	}
 }
 
@@ -47,14 +55,14 @@ func monitorPowerSupply() {
 	for {
 		power, err := readPowerSupply()
 		if err != nil {
-			fmt.Println("Error reading Power Supply:", err)
+			slog.Warn("Error reading Power Supply:", "error", err)
 			continue
 		}
 		power *= 1.1451
 		power += 0.5879
-		sendViaMQTT(powerSupplyConfig.Topic, fmt.Sprintf("%.2f", power))
+		sendViaMQTT(config.PowerSupply.Topic, fmt.Sprintf("%.2f", power))
 
 		// wait for the configured interval before reading again
-		time.Sleep(time.Duration(powerSupplyConfig.Interval) * time.Millisecond)
+		time.Sleep(time.Duration(config.PowerSupply.Interval) * time.Millisecond)
 	}
 }

@@ -48,17 +48,17 @@ To run the Raspberry Pi Monitoring application as a background service on your R
 ## 3. Enable and Start the Service
 1. Reload the systemd manager configuration to recognize the new service:
    ```bash
-   sudo systemctl daemon-reload
+   systemctl --user daemon-reload
    ```
 2. Enable the service to start on boot:
    ```bash
-   sudo systemctl enable ha-rpi-monitoring.service
+   systemctl --user enable ha-rpi-monitoring.service
    ```
 3. Start the service immediately:
    ```bash
-   sudo systemctl start ha-rpi-monitoring.service
+   systemctl --user start ha-rpi-monitoring.service
    ```
 4. Check the status of the service to ensure it is running:
    ```bash
-   sudo systemctl status ha-rpi-monitoring.service
+   systemctl --user status ha-rpi-monitoring.service
    ```

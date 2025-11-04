@@ -15,7 +15,7 @@ To run the Raspberry Pi Monitoring application as a background service on your R
 
     [Service]
     Type=simple
-    WorkingDirectory=/home/rouli/projects/ha-rpi-monitoring
+    WorkingDirectory=/home/<user>/projects/ha-rpi-monitoring
     ExecStart=/usr/local/bin/start_ha_rpi_monitoring.sh
     Restart=always
     RestartSec=5
@@ -29,7 +29,7 @@ To run the Raspberry Pi Monitoring application as a background service on your R
 1. Create a shell script named `start_ha_rpi_monitoring.sh` in the `/usr/local/bin/` directory to set the environment variables and start the application:
     ```bash
     #!/bin/bash
-    cd /home/rouli/projects/ha-rpi-monitoring
+    cd /home/<user>/projects/ha-rpi-monitoring
 
     mkdir -p build
 
@@ -38,7 +38,7 @@ To run the Raspberry Pi Monitoring application as a background service on your R
         /usr/local/go/bin/go build -o build/main .
     fi
 
-    exec /home/rouli/projects/ha-rpi-monitoring/build/main
+    exec /home/<user>/projects/ha-rpi-monitoring/build/main
     ```
 2. Make the script executable:
     ```bash

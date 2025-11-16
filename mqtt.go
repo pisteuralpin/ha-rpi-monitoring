@@ -16,10 +16,13 @@ func sendViaMQTT(topic string, payload string) {
 	client := mqtt.NewClient(opts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		slog.Error("Error connecting to MQTT broker:", "error", token.Error())
-		panic(token.Error())
+		return
 	}
-
 	token := client.Publish(topic, 0, false, payload)
+	if token.Error() != nil {
+		slog.Error("Error publishing to MQTT broker:", "error", token.Error())
+		return
+	}
 	token.Wait()
 
 	slog.Debug("Data sent on " + topic)
